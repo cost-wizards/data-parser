@@ -1,11 +1,12 @@
-FROM public.ecr.aws/lambda/python:3.10
+FROM public.ecr.aws/lambda/python:3.9
 
-WORKDIR ${LAMBDA_TASK_ROOT}
+WORKDIR /usr/src/app
+
+COPY ./setup.py .
 
 RUN python3 -m ensurepip
+RUN pip install .
 
 COPY . ${LAMBDA_TASK_ROOT}
 
-RUN pip install -r requirements.txt
-
-CMD ["main.py"]
+CMD ["cost_wizard.main.handler"]

@@ -6,6 +6,7 @@ from collections import defaultdict
 from datetime import datetime
 
 import boto3
+from loguru import logger
 from pypika import Query, Table
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
@@ -27,7 +28,7 @@ db_username = os.getenv("DB_USERNAME", "postgres")
 db_password = os.getenv("DB_PASSWORD", "password")
 db_host_name = os.getenv("DB_HOST_NAME", "localhost")
 db_name = os.getenv("DB_NAME", "cost_wiz")
-db_port = 5434
+db_port = 5432
 
 db_url = f"postgresql+psycopg2://{db_username}:{db_password}@{db_host_name}:{db_port}/{db_name}"
 
@@ -53,8 +54,11 @@ def parse_data(data):
 
 table = Table("instance_stats")
 
+logger.info("Ok")
 
-def lambda_handler(event, context):
+
+def handler(event, context):
+    logger.info("Started")
 
     bucket = event["Records"][0]["s3"]["bucket"]["name"]
     key = urllib.parse.unquote_plus(event["Records"][0]["s3"]["object"]["key"], encoding="utf-8")
@@ -95,5 +99,7 @@ def lambda_handler(event, context):
         conn.commit()
 
         conn.close()
+
+        logger.info("End")
     except Exception as e:
-        print(e)
+        logger.error(e)
